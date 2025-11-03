@@ -1,0 +1,149 @@
+<!-- Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT License. -->
+<!-- This file shows how to design a first-run page that provides a welcome screen to the user about the features of the add-in. -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SMART INBOX</title>
+
+    <!-- Load the Office JavaScript APIs -->
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
+
+    <!-- For more information on Fluent UI, visit https://developer.microsoft.com/fluentui#/. -->
+    <link rel="stylesheet"
+        href="https://res-1.cdn.office.net/files/fabric-cdn-prod_20230815.002/office-ui-fabric-core/11.1.0/css/fabric.min.css" />
+
+    <!-- Template styles -->
+    <link href="taskpane.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="ms-font-m ms-welcome ms-Fabric">
+    <header class="ms-welcome__header ms-bgColor-neutralLighter">
+        <img width="90" height="90" src="../../assets/logo-filled.png" alt="Contoso" title="Contoso" />
+        <h1 class="ms-font-su">Welcome ABM 2</h1>
+    </header>
+    <main class="ms-firstrun-instructionstep">
+        <section class="ms-Fabric samples ms-font-m" id="integration-list">
+            <ul>
+                <li>
+                    <a href="#" class="expand ms-Button">
+                        <span class="right-arrow ms-Button-label">+</span>
+                        <span class="icon london ms-font-m"></span>
+                        <h2 class="ms-font-l">MDR 1</h2>
+                        <span class="ms-font-s">
+                            Lorem ipsum dolor sit amet
+                        </span>
+                    </a>
+                    <div class="detail ms-TextField">
+                        <div class="ms-font-s">
+                            <p>
+                            <p>
+                                <strong>Duis autem vel eum iriure dolor</strong> in hendrerit in vulputate velit esse
+                                <em>molestie consequat</em>, vel illum dolore eu feugiat nulla facilisis at vero eros
+                                <u>et accumsan et iusto odio dignissim</u> qui blandit praesent
+                                <span style="color:#0078D4;">luptatum zzril delenit augue</span>
+                                duis dolore <strong><em>te feugait nulla facilisi</em></strong>.
+                                <a href="https://your-addin-url.com" style="
+                                    background:#0078D4;color:white;padding:8px 14px;
+                                    border-radius:4px;text-decoration:none;">
+                                    Open Add-in
+                                    </a>
+
+                            </p>
+                            <ul style="margin-top: 8px;">
+                                <li>Duis autem vel eum iriure dolor in hendrerit</li>
+                                <li>Vel illum dolore eu feugiat nulla facilisis</li>
+                                <li>At vero eros et accumsan et iusto odio dignissim</li>
+                                <li>Blandit praesent luptatum zzril delenit augue</li>
+                            </ul>
+                            </p>
+                        </div>
+                        <br />
+                        <button class="ms-Button">
+                            <span class="ms-Button-label">Insérer</span>
+                        </button>
+                    </div>
+                </li>
+                <li>
+                    <a href="#" class="expand ms-Button">
+                        <span class="right-arrow ms-Button-label">+</span>
+                        <span class="icon newyork ms-font-m"></span>
+                        <h2 class="ms-font-l">MDR 2</h2>
+                        <span class="ms-font-s">
+                            Duis autem vel eum iriure dolor in hendrerit
+                        </span>
+                    </a>
+
+                    <div class="detail ms-TextField">
+                        <div class="ms-font-s">
+                            Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat,
+                            vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim
+                            qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
+                        </div>
+                        <br />
+                        <button class="ms-Button">
+                            <span class="ms-Button-label">Insérer</span>
+                        </button>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </main>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const expandButtons = document.querySelectorAll("#integration-list .expand");
+
+        expandButtons.forEach(function (button) {
+            button.addEventListener("click", function (e) {
+                e.preventDefault();
+
+                const detail = this.parentElement.querySelector(".detail");
+                const arrow = this.querySelector(".right-arrow");
+
+                if (detail.style.maxHeight && detail.style.maxHeight !== "0px") {
+                    detail.style.maxHeight = "0px";
+                    arrow.textContent = "+";
+                } else {
+                    detail.style.maxHeight = detail.scrollHeight + "px";
+                    arrow.textContent = "–";
+                }
+            });
+        });
+
+        const insertButtons = document.querySelectorAll("#integration-list .detail .ms-Button");
+
+        insertButtons.forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                const li = this.closest("li");
+
+                // Extract the HTML content including inline styles
+                const title = li.querySelector("h2").outerHTML;
+                const subtitle = li.querySelector(".expand .ms-font-s").outerHTML;
+                const detailHTML = li.querySelector(".detail .ms-font-s").innerHTML;
+
+                const htmlToInsert = `
+            <div>${detailHTML}</div>
+      `;
+
+                Office.context.mailbox.item.body.setSelectedDataAsync(
+                    htmlToInsert,
+                    { coercionType: Office.CoercionType.Html },
+                    function (asyncResult) {
+                        if (asyncResult.status === Office.AsyncResultStatus.Failed) {
+                            console.error(asyncResult.error.message);
+                        }
+                    }
+                );
+            });
+        });
+
+    });
+
+</script>
+
+</html>
