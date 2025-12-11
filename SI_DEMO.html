@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Maquette Outlook-like (avec collapse MDR)</title>
+<style>
+  :root{
+    --bg:#f5f5f5;
+    --white:#ffffff;
+    --border:#111;
+    --muted:#e6e6e6;
+    --panel-bg:#fafafa;
+    --text:#222;
+    --font: "Segoe UI", Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
+
+  .container{
+    display:grid;
+    grid-template-columns: 2fr 1fr;
+    gap:0;
+    height:100vh;
+    padding:18px;
+    align-items:start;
+  }
+
+  .mail-zone{
+    background:var(--white);
+    padding:18px;
+    border-right: 1px solid #ddd;
+    overflow:auto;
+  }
+
+  .objet-row{
+    display:grid;
+    grid-template-columns:1fr 150px;
+    gap:12px;
+    align-items:start;
+    margin-bottom:20px;
+  }
+
+  .subject-box{
+    border:1px solid var(--border);
+    padding:12px;
+    height:56px;
+    display:flex;
+    align-items:center;
+    background:var(--white);
+  }
+  .subject-box input{border:0;outline:none;font-size:16px;width:100%}
+
+  .reply-box{
+    border:1px solid var(--border);
+    height:56px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--white);
+  }
+  .reply-btn{
+    width:100%;height:100%;border:0;background:transparent;font-weight:700;cursor:pointer;font-size:16px;
+  }
+
+  .mail-section{margin-bottom:20px}
+  .label{font-weight:700;margin-bottom:8px;display:block}
+  .mail-body{
+    border:1px solid var(--border);
+    padding:12px;
+    min-height:140px;
+    resize:vertical;
+    width:100%;
+    background:var(--white);
+  }
+
+  .mail-body-full{
+    border:1px solid var(--border);
+    padding:16px;
+    min-height:380px;
+    width:100%;
+    background:var(--white);
+  }
+
+  .panel{
+    background:var(--panel-bg);
+    padding:20px;
+    overflow:auto;
+  }
+  .panel-title{font-weight:700;margin-bottom:18px}
+
+  .mdr-block{
+    background:var(--white);
+    border:1px solid #ddd;
+    padding:14px;
+    margin-bottom:14px;
+    border-radius:4px;
+  }
+
+  .mdr-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+    font-weight:700;
+    cursor:pointer;
+  }
+
+  .mdr-text{font-size:14px;line-height:1.4;color:#444;display:none;margin-top:10px}
+  .mdr-text.open{display:block}
+
+  .btn-insert{
+    margin-top:12px;
+    display:inline-block;
+    padding:8px 12px;
+    background:var(--muted);
+    border:1px solid #ccc;
+    border-radius:4px;
+    cursor:pointer;
+    font-weight:700;
+  }
+
+  @media(max-width:900px){
+    .container{grid-template-columns:1fr}
+    .objet-row{grid-template-columns:1fr 120px}
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="mail-zone">
+    <div class="objet-row">
+      <div class="subject-box"><input type="text" placeholder="Objet du mail"></div>
+      <div class="reply-box"><button class="reply-btn" type="button">Répondre</button></div>
+    </div>
+
+    <div class="mail-section">
+      <label class="label">Corps du mail</label>
+      <div class="mail-body" contenteditable="true"></div>
+    </div>
+
+    <div class="mail-section">
+      <label class="label">Corps du mail + MDR sélectionné</label>
+      <div class="mail-body-full" contenteditable="true"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Prepend text to item body</div>
+
+    <div class="mdr-block">
+      <div class="mdr-header"><span>MDR 1</span><span class="toggle">+</span></div>
+      <div class="mdr-text">Lorem ipsum dolor sit amet. Duis autem vel eum iriure dolor.</div>
+      <button class="btn-insert">Insérer</button>
+    </div>
+
+    <div class="mdr-block">
+      <div class="mdr-header"><span>MDR 2</span><span class="toggle">+</span></div>
+      <div class="mdr-text">Duis autem vel eum iriure dolor in hendrerit.</div>
+      <button class="btn-insert">Insérer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.mdr-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const block = header.parentElement;
+      const text = block.querySelector('.mdr-text');
+      const toggle = header.querySelector('.toggle');
+
+      const isOpen = text.classList.contains('open');
+      text.classList.toggle('open');
+      toggle.textContent = isOpen ? '+' : '-';
+    });
+  });
+  document.querySelectorAll('.btn-insert').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const block = btn.parentElement;
+      const text = block.querySelector('.mdr-text').textContent.trim();
+
+      const target = document.querySelector('.mail-body-full');
+      target.focus();
+
+      // Insert text at cursor position
+      const selection = window.getSelection();
+      if (!selection.rangeCount) return;
+      const range = selection.getRangeAt(0);
+      range.deleteContents();
+      range.insertNode(document.createTextNode(text + "\n"));
+
+      // Move cursor to end
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    });
+  });
+
+</script>
+
+</body>
+</html>
