@@ -196,8 +196,127 @@
       selection.addRange(range);
     });
   });
+  /*
+async function authorize() {
+  // Redirige vers l'endpoint d'autorisation
+  const clientId = 'TON_CLIENT_ID';
+  const redirectUri = 'http://localhost:3000'; // où tu veux récupérer le code
+  const url = `https://ton-api.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+  window.location.href = url;
+}
+
+async function getToken(code) {
+  try {
+    const response = await fetch('https://ton-api.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code,
+        client_id: 'TON_CLIENT_ID',
+        client_secret: 'TON_CLIENT_SECRET',
+        redirect_uri: 'http://localhost:3000',
+        grant_type: 'authorization_code'
+      })
+    });
+
+    if (!response.ok) throw new Error('Erreur token');
+    const data = await response.json();
+    return data.access_token; // récupère le token
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
+async function sendMailAndFetchMDR(token, email, subject, body) {
+  try {
+    const response = await fetch('https://ton-api.com/mails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ email, subject, body })
+    });
+
+    if (!response.ok) throw new Error('Erreur API mail');
+    return await response.json(); // tableau d'objets { titre, mdr, ordre }
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
+
+document.querySelector('.reply-btn').addEventListener('click', async () => {
+  const email = "anis@bnp.fr";
+  const subject = document.querySelector('.subject-box input').value.trim();
+  const body = document.querySelector('.mail-body').innerText.trim();
+
+  // Vérifie si on a déjà un code dans l'URL
+  const urlParams = new URLSearchParams(window.location.search);
+  let code = urlParams.get('code');
+
+  if (!code) {
+    // Pas de code : redirige vers /authorize
+    authorize();
+    return;
+  }
+
+  // Récupération du token
+  const token = await getToken(code);
+  if (!token) return alert('Impossible de récupérer le token');
+
+  // Appel final pour récupérer les MDR
+  const mdrList = await sendMailAndFetchMDR(token, email, subject, body);
+
+  // Génération du panel MDR
+  const panel = document.querySelector('.panel');
+  panel.innerHTML = '<div class="panel-title">Prepend text to item body</div>';
+  mdrList.sort((a,b)=>a.ordre-b.ordre).forEach(item=>{
+    const block = document.createElement('div');
+    block.className='mdr-block';
+    block.innerHTML=`
+      <div class="mdr-header"><span>${item.titre}</span><span class="toggle">+</span></div>
+      <div class="mdr-text">${item.mdr}</div>
+      <button class="btn-insert">Insérer</button>
+    `;
+    panel.appendChild(block);
+  });
+
+  // Re-attach toggle & insert events
+  panel.querySelectorAll('.mdr-header').forEach(header=>{
+    header.addEventListener('click',()=>{
+      const block=header.parentElement;
+      const text=block.querySelector('.mdr-text');
+      const toggle=header.querySelector('.toggle');
+      const isOpen=text.classList.contains('open');
+      text.classList.toggle('open');
+      toggle.textContent=isOpen?'+':'-';
+    });
+  });
+
+  panel.querySelectorAll('.btn-insert').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const block=btn.parentElement;
+      const text=block.querySelector('.mdr-text').textContent.trim();
+      const target=document.querySelector('.mail-body-full');
+      target.focus();
+      const selection=window.getSelection();
+      if(!selection.rangeCount) return;
+      const range=selection.getRangeAt(0);
+      range.deleteContents();
+      range.insertNode(document.createTextNode(text+"\n"));
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    });
+  });
+});
+*/
 
 </script>
 
 </body>
 </html>
+
+
